@@ -1,0 +1,25 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title C4 Model - Level 1: System Context (Dez Fitness Center Discovery App)
+
+Person(user, "User", "Individual using web/mobile app")
+Person(admin, "Admin/Partner", "Facility owner or admin user")
+
+System_Boundary(system, "Dez Fitness Center Discovery App") {
+    System(app, "Dez Fitness Center Discovery App", "Provides onboarding, conversational AI, recommendations and facility search.")
+}
+
+System_Ext(llm, "LLM Provider", "OpenAI/Anthropic")
+System_Ext(maps, "Google Maps API", "Maps, geocoding & places")
+System_Ext(email, "Email Provider", "SendGrid/Mailgun")
+System_Ext(whatsapp, "Twilio WhatsApp API", "Notification delivery")
+
+Rel(user, app, "Uses via web/mobile")
+Rel(admin, app, "Manages facilities")
+
+Rel(app, llm, "LLM requests")
+Rel(app, maps, "Geolocation / search queries")
+Rel(app, email, "Sends emails")
+Rel(app, whatsapp, "Sends WhatsApp messages")
+@enduml

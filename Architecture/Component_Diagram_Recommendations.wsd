@@ -1,0 +1,36 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title C4 Model - Level 3: Recommendation Service (Domain Components)
+
+Container_Boundary(recommendation_service, "Recommendation Service") {
+
+    Component(api_handler, "API Handler", "Lambda Function","Validates JWT, processes user input, triggers orchestrator.")
+
+    Component(profile_processor, "Profile Processor", "Lambda Function","Normalizes and enriches user profile with geodata.")
+
+    Component(orchestrator, "LLM Orchestrator", "Lambda Function","Builds prompts, calls LLM APIs, applies guardrails.")
+
+    Component(matcher, "Facility Matcher", "Lambda Function","Queries facility DB, scores facilities, ranks recommendations.")
+
+    Component(cache, "Recommendation Cache", "DynamoDB","Stores cached recommendations with TTL.")
+
+    Component(event_publisher, "Event Publisher", "SNS","Publishes RecommendationReady event.")
+
+    ComponentDb(rds, "PostgreSQL", "Aurora Serverless v2","Stores canonical user profiles and recommendation logs.")
+
+    Component_Ext(llm, "LLM Provider", "OpenAI/Anthropic")
+    Component_Ext(maps, "Google Maps API")
+}
+
+Rel(api_handler, profile_processor, "Sends profile")
+Rel(profile_processor, orchestrator, "Enriched profile")
+Rel(orchestrator, llm, "Prompt → Completion")
+Rel(orchestrator, matcher, "LLM output → Filters")
+Rel(matcher, rds, "Query facilities")
+Rel(matcher, cache, "Save recommendations")
+Rel(api_handler, cache, "Return cached recommendations")
+Rel(matcher, event_publisher, "Publish RecommendationReady")
+Rel(orchestrator, maps, "Location/enrichment")
+
+@enduml

@@ -1,0 +1,63 @@
+@startuml
+
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title C4 Model - Level 2: Container Diagram (Dez Fitness Center Discovery App)
+
+Person(user, "User")
+Person(admin, "Admin")
+
+System_Boundary(app, "Dez Fitness Center Discovery App") {
+    Container(frontend, "Micro-Frontend Web App", "React / Module Federation","Served from S3 + CloudFront. UI for onboarding, chat, and recommendations.")
+
+    Container(api, "API Gateway", "AWS API Gateway","Entry point for all API calls from the frontend.")
+
+    Container(auth, "Authentication", "Amazon Cognito","Manages user authentication and JWT tokens.")
+
+    Container_Boundary(services, "Domain Microservices (Lambdas)") {
+        Container(onboarding, "Onboarding Service", "AWS Lambda","Handles chat, NLU extraction, PAR-Q, onboarding flows.")
+
+        Container(recommendation, "Recommendation Service", "AWS Lambda","Generates LLM-driven recommendations and matches facilities.")
+
+        Container(facility, "Facility Service", "AWS Lambda","CRUD for fitness centers, search integration.")
+
+        Container(communication, "Communication Service", "AWS Lambda","Sends email/WhatsApp notifications via SNS/SQS.")
+    }
+
+    Container(stepfn, "Workflow Orchestration", "AWS Step Functions","Manages onboarding, recommendation pipelines, complex flows.")
+
+    Container(sns, "Event Bus", "Amazon SNS","Domain event publishing and fan-out.")
+
+    ContainerDb(rds, "User & Facility DB", "Aurora PostgreSQL","Canonical relational data (profiles, facilities, bookings).")
+
+    ContainerDb(dynamo, "Session Store", "DynamoDB","Chat sessions, transcripts, caches, TTL-driven ephemeral data.")
+
+    Container_Ext(llm, "LLM Provider", "OpenAI/Anthropic", "Text generation")
+    Container_Ext(maps, "Maps API", "Google Maps API", "Geocoding, places")
+    Container_Ext(email, "Email Provider", "SendGrid/Mailgun", "Transactional emails")
+    Container_Ext(whatsapp, "Twilio WhatsApp API", "Twilio", "WhatsApp notifications")
+}
+
+Rel(user, frontend, "Uses")
+Rel(frontend, api, "Sends API requests")
+Rel(api, auth, "Validates JWT tokens")
+Rel(api, onboarding, "Routes API -> Lambda")
+Rel(api, recommendation, "Routes API -> Lambda")
+Rel(api, facility, "Routes API -> Lambda")
+
+Rel(onboarding, dynamo, "Stores conversation state")
+Rel(onboarding, stepfn, "Triggers onboarding workflow")
+Rel(stepfn, sns, "Publish events")
+
+Rel(recommendation, llm, "LLM calls")
+Rel(recommendation, maps, "Geo lookup")
+Rel(recommendation, rds, "Reads profiles")
+Rel(recommendation, dynamo, "Caches results")
+
+Rel(sns, communication, "Fan-out messages")
+Rel(communication, email, "Send emails")
+Rel(communication, whatsapp, "Send WhatsApp messages")
+
+Rel(facility, rds, "Reads/writes facility data")
+
+@enduml

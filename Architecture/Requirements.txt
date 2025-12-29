@@ -1,0 +1,19 @@
+Problem
+- I often times struggle to find items in a store that I am not used to. I end up searching the whole store going all over the aisles or end up asking someone that works at the store.
+
+I may have a list and spend loads of time again going up and down the store trying to find the items I am looking for. 
+
+I need and app to where I can input what I am looking for and will take directly to the aisle and location of the product
+
+I need an app that will map out the best route to take to get all the items on my list
+
+I need an app that will also suggest items to buy and items that are on sale. Work out the best discounts based on my list. 
+
+tasks 
+- create list
+- input list
+- save list
+- update list
+- delete list
+
+load list in

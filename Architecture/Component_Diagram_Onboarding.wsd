@@ -1,0 +1,35 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title C4 Model - Level 3: Onboarding / Dez AI Chat
+
+Container_Boundary(onboarding_service, "Onboarding Service") {
+
+    Component(chat_gateway, "Chat Gateway", "Lambda (WebSocket/HTTP)","Receives chat messages, persists transcript.")
+
+    Component(nlu, "NLU Extractor", "Lambda","Extracts structured data from user input.")
+
+    Component(conversation_store, "Conversation State", "DynamoDB","Stores chat history, session state, TTL ephemeral data.")
+
+    Component(parq, "PAR-Q Validator", "Lambda","Validates health & safety questions.")
+
+    Component(workflow, "Onboarding Orchestrator", "Step Functions","Manages multi-turn conversations and onboarding flow.")
+
+    Component(event_publisher, "Event Publisher", "SNS","Publishes OnboardingCompleted, SafetyAlert events.")
+        
+    ComponentDb(rds, "User DB", "Aurora PostgreSQL","Stores canonical user info & onboarding results.")
+}
+
+Rel(chat_gateway, conversation_store, "Write transcripts")
+Rel(chat_gateway, workflow, "Trigger workflow steps")
+
+Rel(workflow, nlu, "Extract structured details")
+Rel(nlu, conversation_store, "Update session state")
+
+Rel(workflow, parq, "Validate health answers")
+
+Rel(parq, event_publisher, "SafetyAlert event")
+Rel(workflow, rds, "Write profile on completion")
+Rel(workflow, event_publisher, "OnboardingCompleted event")
+
+@enduml
