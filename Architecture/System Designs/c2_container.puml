@@ -1,0 +1,37 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+System_Boundary(dez, "Dez Fitness Discovery App") {
+
+    Container(web, "Micro-Frontend Web App", "React", "User interface with chat + forms.")
+    Container(api, "API Gateway", "AWS API Gateway", "Entry point for all client requests.")
+    Container(profileSvc, "User Profile Service", "AWS Lambda", "Manages user profiles, questionnaire data and stores in DynamoDB.")
+    ContainerDb(profileDB, "User Profile DB", "DynamoDB", "Stores questionnaire + health info.")
+    Container(recoSvc, "Recommendation Service", "AWS Step Functions + Lambda","Processes user profile & invokes LLM to generate exercise + facility recommendations.")
+    Container(searchSvc, "Facility Search Service", "AWS Lambda","Queries Postgres + Google Maps API for locally relevant fitness facilities.")
+    ContainerDb(pgdb, "Facility Database", "PostgreSQL (RDS)","Stores structured facility metadata.")
+    Container(notifySvc, "Notification Service", "SNS + SES", "Sends email notifications with recommendations.")
+    ContainerQueue(queue, "Async Queue", "SQS", "Handles long-running background tasks.")
+    Container_Ext(llm, "LLM Provider", "OpenAI/Anthropic", "NLP + reasoning.")
+    Container_Ext(maps, "Google Maps API", "Google", "Geolocation + places search.")
+}
+
+Rel(user, web, "Uses", "HTTPS")
+Rel(web, api, "Invokes APIs", "HTTPS")
+Rel(api, profileSvc, "Profile requests")
+Rel(profileSvc, profileDB, "Store/retrieve")
+
+Rel(api, recoSvc, "Trigger recommendation pipeline")
+Rel(recoSvc, llm, "Send prompts")
+Rel(recoSvc, searchSvc, "Request facility search")
+
+Rel(searchSvc, maps, "Location-based search")
+Rel(searchSvc, pgdb, "Read facility data")
+
+Rel(recoSvc, notifySvc, "Send recommended facilities")
+Rel(notifySvc, user, "Email recommendations")
+
+Rel(api, queue, "Publish async tasks")
+Rel(queue, recoSvc, "Triggered for long-running flows")
+
+@enduml

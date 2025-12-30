@@ -1,0 +1,18 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container_Boundary(reco, "Recommendation Service") {
+    Component(llmClient, "LLMClient", "TypeScript Class", "Handles prompt creation + calling OpenAI/Anthropic.")
+    Component(profileModel, "ProfileModel", "TypeScript Class", "Represents user questionnaire + preferences.")
+    Component(recoPipeline, "RecommendationPipeline", "TypeScript Module", "Orchestrates workflow between LLM + facility service.")
+    Component(explanationGen, "ExplanationGenerator", "TypeScript Class","Generates human-readable explanations.")
+    Component(facilityRepo, "FacilityRepository", "TypeScript Class", "Queries facility metadata via Lambda -> Postgres.")
+    Component(parser, "LLMResponseParser", "TypeScript Class","Converts raw LLM output into structured recommendation objects.")
+}
+
+Rel(recoPipeline, llmClient, "Uses")
+Rel(recoPipeline, facilityRepo, "Queries facilities")
+Rel(recoPipeline, explanationGen, "Produces explanation text")
+Rel(llmClient, parser, "Delegates LLM output parsing")
+
+@enduml

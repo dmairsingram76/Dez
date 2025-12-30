@@ -1,0 +1,14 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+Person(user, "End User", "Anyone seeking personalised fitness facilities.")
+System(dez, "Dez Fitness Discovery App", "AI-powered personalised fitness discovery system.")
+
+System_Ext(llm, "LLM Provider", "OpenAI or Anthropic used for natural language processing.")
+System_Ext(maps, "Google Maps API", "Geolocation + places search.")
+
+Rel(user, dez, "Interacts via chat or forms")
+Rel(dez, llm, "Sends profile + questions", "HTTPS")
+Rel(dez, maps, "Fetches nearby facilities", "HTTPS")
+
+@enduml

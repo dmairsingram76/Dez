@@ -1,0 +1,35 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container_Boundary(reco, "Recommendation Service (Step Functions + Lambda)") {
+
+    Component(orchestrator, "Orchestrator", "AWS Step Functions", "Coordinates recommendation flow from profile → LLM → facilities.")
+    
+    Component(normaliser, "Input Normaliser", "Lambda", "Cleans & formats user profile for LLM processing.")
+    
+    Component(llmHandler, "LLM Handler", "Lambda", "Constructs prompts + interprets LLM outputs.")
+    
+    Component(recoEngine, "Recommendation Engine", "Lambda", "Combines LLM output + facility search results into final recommendations.")
+    
+    Component(explain, "Explanation Engine", "Lambda", "Generates rationale for each recommendation.")
+    
+    Component(searchInvoker, "Facility Search Invoker", "Lambda","Calls Facility Search Service.")
+}
+
+Container_Ext(profileDB, "User Profile DB", "DynamoDB", "User data")
+Container_Ext(searchSvc, "Facility Search Service", "Lambda", "Facility lookup")
+Container_Ext(llm, "LLM Provider", "OpenAI/Anthropic", "Reasoning engine")
+
+Rel(orchestrator, normaliser, "Invoke")
+Rel(normaliser, llmHandler, "Send prompt request")
+Rel(llmHandler, llm, "LLM prompt")
+Rel(llmHandler, recoEngine, "LLM response → structured data")
+
+Rel(orchestrator, searchInvoker, "Trigger facility search")
+Rel(searchInvoker, searchSvc, "Search facilities")
+Rel(recoEngine, explain, "Generate explanations")
+
+Rel(explain, orchestrator, "Return final recommendations")
+Rel(recoEngine, orchestrator, "Return structured recommendations")
+
+@enduml
