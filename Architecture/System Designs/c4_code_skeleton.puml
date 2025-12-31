@@ -1,4 +1,4 @@
-@startuml
+@startuml c4_code_skeleton
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
 
 Container_Boundary(reco, "Recommendation Service") {

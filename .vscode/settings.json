@@ -1,0 +1,8 @@
+{
+  "plantuml.jar": "${workspaceFolder}/.plantuml/plantuml.jar",
+  "plantuml.server": "https://www.plantuml.com/plantuml",
+  "plantuml.render": "Local",
+  "plantuml.exportOutDir": "out",
+  "plantuml.exportSubFolder": false
+}
+

@@ -1,4 +1,4 @@
-@startuml
+@startuml c2_container
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
 System_Boundary(dez, "Dez Fitness Discovery App") {

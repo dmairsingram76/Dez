@@ -1,0 +1,56 @@
+@startuml
+!define Table entity
+!theme plain
+
+' ----------------------------
+'  ENTITIES
+' ----------------------------
+
+Table "User" as User {
+  * userId : UUID <<PK>>
+  --
+  createdAt : datetime
+  updatedAt : datetime
+}
+
+Table "Profile" as Profile {
+  * userId : UUID <<PK, FK>>
+  --
+  age : int
+  heightCm : int
+  weightKg : int
+  geohash : string
+  preferences : json
+}
+
+Table "QuestionnaireResponse" as QR {
+  * responseId : UUID <<PK>>
+  --
+  userId : UUID <<FK>>
+  questionnaireVersion : int
+  completed : boolean
+  createdAt : datetime
+  updatedAt : datetime
+  rawResponses : json
+}
+
+Table "ExtractedAttributes" as EA {
+  * attrId : UUID <<PK>>
+  --
+  userId : UUID <<FK>>
+  injuries : json
+  medicalConditions : json
+  preferredTypes : json
+  avoidedTypes : json
+  motivation : json
+}
+
+' ----------------------------
+'  RELATIONSHIPS
+' ----------------------------
+
+User ||--|| Profile : "1 : 1"
+User ||--o{ QR : "1 : many"
+User ||--|| EA : "1 : 1"
+
+@enduml
